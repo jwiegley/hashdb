@@ -37,7 +37,7 @@ def inserter(conn, cursor, q):
             q.task_done()
             break
 
-        cursor.execute(u'''INSERT OR REPLACE INTO checksums
+        cursor.execute(u'''INSERT INTO checksums
                                (checksum, path, is_mail) VALUES (?, ?, ?)''',
                        (checksum, path, 1 if ismail else 0))
 
@@ -74,6 +74,8 @@ class entry_queuer:
 
         if checksum:
             self.queue.put((checksum, path, opts.msgid))
+        elif opts.msgid:
+            print >>sys.stderr, "No Message-Id in:", path
         else:
             print >>sys.stderr, "No checksum in:", path
 
@@ -96,8 +98,7 @@ def update_database(directories):
         checksum TEXT(255) NOT NULL,
         path TEXT(4096) NOT NULL,
         is_mail INTEGER NOT NULL,
-        PRIMARY KEY (checksum),
-        UNIQUE (checksum)
+        PRIMARY KEY (checksum)
     )''')
 
     try:
@@ -145,7 +146,7 @@ def remover(conn, cursor, q):
     print >>sys.stderr, "Removing %d duplicates..." % len(paths)
     for path in paths:
         if isfile(path):
-            map(os.remove, paths)
+            os.remove(path)
     print >>sys.stderr, "Done Removing duplicates..."
 
 def remove_duplicates(directories):

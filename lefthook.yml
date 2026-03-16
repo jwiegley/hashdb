@@ -1,0 +1,23 @@
+pre-commit:
+  parallel: true
+  commands:
+    ruff-format:
+      glob: "*.py"
+      run: ruff format --check {staged_files}
+    ruff-lint:
+      glob: "*.py"
+      run: ruff check {staged_files}
+    pytest:
+      glob: "*.{py,toml}"
+      run: PYTHONPATH=src python -m pytest tests/ -x -q
+    coverage:
+      glob: "*.{py,toml}"
+      run: >-
+        PYTHONPATH=src python -m pytest tests/
+        --cov=hashdb --cov-report=term-missing --cov-fail-under=70
+    fuzz:
+      glob: "*.py"
+      run: PYTHONPATH=src python -m pytest tests/test_fuzz.py -x -q
+    nix-build:
+      glob: "*.{py,nix,toml}"
+      run: nix build --no-warn-dirty 2>&1

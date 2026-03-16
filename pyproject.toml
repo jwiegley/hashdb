@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hashdb"
+version = "0.1.0"
+description = "File checksum database for duplicate detection"
+requires-python = ">=3.9"
+license = "BSD-3-Clause"
+authors = [{ name = "John Wiegley", email = "johnw@newartisans.com" }]
+
+[project.scripts]
+hashdb = "hashdb.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 79
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",       # pydocstyle (we don't enforce docstring style)
+    "ANN",     # flake8-annotations (no mandatory type annotations)
+    "T20",     # flake8-print (we print to stderr intentionally)
+    "FBT",     # flake8-boolean-trap (argparse booleans are fine)
+    "S324",    # md5 usage (intentional, not for security)
+    "ERA",     # commented-out code
+    "PLR0913", # too many arguments
+    "COM812",  # trailing comma (conflicts with formatter)
+    "ISC001",  # implicit string concat (conflicts with formatter)
+    "PTH",     # pathlib (multiprocessing needs string paths)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",    # assert in tests is fine
+    "S108",    # /tmp in test data is fine
+    "PLR2004", # magic values in tests are fine
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-x -q"
+
+[tool.coverage.run]
+source = ["hashdb"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
